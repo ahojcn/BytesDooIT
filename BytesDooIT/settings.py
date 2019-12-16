@@ -123,9 +123,6 @@ STATIC_URL = '/static/'
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = private.EMAIL_HOST
 EMAIL_PORT = private.EMAIL_PORT
-# 发送邮件的邮箱
 EMAIL_HOST_USER = private.EMAIL_HOST_USER
-# 在邮箱中设置的客户端授权密码
 EMAIL_HOST_PASSWORD = private.EMAIL_HOST_PASSWORD
-# 收件人看到的发件人
 EMAIL_FROM = private.EMAIL_FROM
