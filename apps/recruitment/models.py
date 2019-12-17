@@ -1,7 +1,7 @@
 from django.db import models
 
-from apps.user.models import User, UserResume
-from apps.exam.models import Exam
+from user.models import User, UserResume
+from exam.models import Exam
 
 
 class RecruitmentCategory(models.Model):

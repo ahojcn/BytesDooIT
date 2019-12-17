@@ -11,10 +11,14 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+import sys
+
 from BytesDooIT import private
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, BASE_DIR)
+sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
@@ -25,26 +29,34 @@ SECRET_KEY = private.SECRET_KEY
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
+
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOW_HEADERS = ('*',)
+CORS_ALLOW_CREDENTIALS = True
 
 # Application definition
 
 INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'rest_framework',   # drf
-    'corsheaders',      # 跨域请求头
+    'corsheaders',  # 跨域请求头
+    'rest_framework',
 
-    'apps.auth',        # 权限
-    'apps.comment',     # 评论
-    'apps.exam',        # 笔试
-    'apps.interview',   # 面试
-    'apps.post',        # 文章
-    'apps.recruitment', # 招聘
-    'apps.user',        # 用户
-    'apps.video',       # 视频
+    'mauth',  # 权限
+    'comment',  # 评论
+    'exam',  # 笔试
+    'interview',  # 面试
+    'post',  # 文章
+    'recruitment',  # 招聘
+    'user',  # 用户
+    'util',  # util
+    'video',  # 视频
 ]
 
 MIDDLEWARE = [
@@ -53,6 +65,7 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',  # cors headers
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]

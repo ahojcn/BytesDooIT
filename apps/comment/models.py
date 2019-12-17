@@ -1,8 +1,8 @@
 from django.db import models
 
-from apps.user.models import User
-from apps.post.models import Post
-from apps.video.models import Video
+from user.models import User
+from post.models import Post
+from video.models import Video
 
 
 class Comment(models.Model):
