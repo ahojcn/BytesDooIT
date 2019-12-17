@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
-from . import private
+from BytesDooIT import private
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -37,7 +37,13 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
 
-    'apps.user'
+    'apps.comment',
+    'apps.exam',
+    'apps.interview',
+    'apps.post',
+    'apps.recruitment',
+    'apps.user',
+    'apps.video',
 ]
 
 MIDDLEWARE = [
