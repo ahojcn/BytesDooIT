@@ -34,16 +34,17 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'rest_framework',
-    'corsheaders',
+    'rest_framework',   # drf
+    'corsheaders',      # 跨域请求头
 
-    'apps.comment',
-    'apps.exam',
-    'apps.interview',
-    'apps.post',
-    'apps.recruitment',
-    'apps.user',
-    'apps.video',
+    'apps.auth',        # 权限
+    'apps.comment',     # 评论
+    'apps.exam',        # 笔试
+    'apps.interview',   # 面试
+    'apps.post',        # 文章
+    'apps.recruitment', # 招聘
+    'apps.user',        # 用户
+    'apps.video',       # 视频
 ]
 
 MIDDLEWARE = [
