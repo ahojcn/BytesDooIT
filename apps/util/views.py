@@ -13,7 +13,6 @@ class CSRFTokenView(APIView):
         获取 csrf token
         """
         resp_data = {'status': 0, 'msg': 'success', 'data': {}}
-        token = get_token(request)
+        get_token(request)
         resp_obj = Response(resp_data)
-        resp_obj.set_cookie('X-CSRFToken', token)
         return resp_obj

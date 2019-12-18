@@ -15,7 +15,7 @@
 ```json
 POST
 /api/util/get_csrf_token
-Content-Type: application/x-www-form-urlencoded
+Content-Type: application/json
 ```
 
 **参数说明**
@@ -42,9 +42,9 @@ Content-Type: application/x-www-form-urlencoded
 
 **备注**
 
-请求后的 request 会向 Cookies 中添加一个 X-CSRFToken 字段，值即为 token，不用单独保存。
+请求后的 request 会向 Cookies 中添加一个 csrftoken 字段，值即为 token，不用单独保存。
 
-在使用其他接口请求时需在 headers 里带上这个 X-CSRFToken。
+在使用其他接口请求时需在 headers 里带上这个 csrftoken。
 
 
 
