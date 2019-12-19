@@ -19,6 +19,10 @@ class UserView(APIView):
         用户注册
         """
         resp_data = {'data': {}, 'status_code': 0, 'msg': '成功'}
+        # print(request.META.get('REMOTE_ADDR'))
+
+        # request.META.get('HTTP_X_FORWARDED_FOR') if request.META.get('HTTP_X_FORWARDED_FOR') else request.META.get(
+        # 'REMOTE_ADDR')
 
         username = request.data.get('username')
         email = request.data.get('email')
@@ -85,7 +89,7 @@ class UserView(APIView):
         # 发送激活邮件
         active_url = settings.BASE_WEB_URL + 'api/user/active?token=' + token
         tasks.send_email.delay('激活你的账号', '', [email], 'email_user_active.html',
-                         {'username': username, 'email': email, 'active_url': active_url})
+                               {'username': username, 'email': email, 'active_url': active_url})
 
         # 返回用户信息
         resp_data['status_code'] = 0
