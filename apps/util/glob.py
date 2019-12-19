@@ -1,4 +1,4 @@
-def check_verify_code(request, code):
+def check_verify_code(request, code) -> bool:
     """
     校验验证码
     :param request: 请求对象
