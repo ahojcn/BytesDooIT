@@ -1,0 +1,1 @@
+celery -A apps.util.celery_tasks.tasks worker -l info

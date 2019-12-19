@@ -9,7 +9,7 @@ from rest_framework.views import APIView
 
 from user.models import User
 from util.glob import check_verify_code
-from util.celery_tasks.tasks import send_email
+from util.celery_tasks import tasks
 
 
 class UserView(APIView):
@@ -84,7 +84,7 @@ class UserView(APIView):
 
         # 发送激活邮件
         active_url = settings.BASE_WEB_URL + 'api/user/active?token=' + token
-        send_email.delay('激活你的账号', '', [email], 'email_user_active.html',
+        tasks.send_email.delay('激活你的账号', '', [email], 'email_user_active.html',
                          {'username': username, 'email': email, 'active_url': active_url})
 
         # 返回用户信息
