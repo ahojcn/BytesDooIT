@@ -1,12 +1,110 @@
-from django.shortcuts import render, HttpResponse
+import re
+import hashlib
+
+from django.conf import settings
+
+from itsdangerous import TimedJSONWebSignatureSerializer, SignatureExpired
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from user.models import User
+from util.glob import check_verify_code
+from util.celery_tasks.tasks import send_email
 
 
-from .models import User
+class UserView(APIView):
 
+    def post(self, request):
+        """
+        用户注册
+        """
+        resp_data = {'data': {}, 'status_code': 0, 'msg': '成功'}
 
-def user(request):
-    obj = User.objects.filter(id=1)
+        username = request.data.get('username')
+        email = request.data.get('email')
+        pwd = request.data.get('pwd')
+        c_pwd = request.data.get('c_pwd')
+        verify_code = request.data.get('verify_code')
+        is_agree = request.data.get('is_agree')
 
-    print(obj)
+        # 数据校验
+        if not all([username, email, pwd, c_pwd, verify_code, is_agree]):
+            resp_data['status_code'] = -1
+            resp_data['msg'] = '参数不足'
+            return Response(resp_data)
 
-    return HttpResponse('1')
+        if is_agree is None or int(is_agree) == 0:
+            resp_data['status_code'] = -1
+            resp_data['msg'] = '请先同意用户协议'
+            return Response(resp_data)
+
+        if pwd != c_pwd:
+            resp_data['status_code'] = -1
+            resp_data['msg'] = '两次输入密码不一致'
+            return Response(resp_data)
+
+        if not check_verify_code(request, verify_code):
+            resp_data['status_code'] = -1
+            resp_data['msg'] = '验证码错误'
+            return Response(resp_data)
+
+        if not re.match(r'^[a-zA-Z0-9_-]{4,16}$$', username):
+            resp_data['status_code'] = -1
+            resp_data['msg'] = '用户名必须是4-16位之间的字母、数字、下划线组成'
+            return Response(resp_data)
+
+        if not re.match(r'^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$', email):
+            resp_data['status_code'] = -1
+            resp_data['msg'] = '邮箱格式错误'
+            return Response(resp_data)
+
+        # 判断用户是否存在
+        if len(User.objects.filter(email=email)) != 0:
+            resp_data['status_code'] = -1
+            resp_data['msg'] = '该邮箱已被注册'
+            return Response(resp_data)
+        if len(User.objects.filter(username=username)) != 0:
+            resp_data['status_code'] = -1
+            resp_data['msg'] = '用户已存在'
+            return Response(resp_data)
+
+        # 新增未注册用户
+        pwd_md5 = hashlib.md5(pwd.encode('utf-8')).hexdigest()
+        try:
+            user_obj = User.objects.create(username=username, password=pwd_md5, email=email, is_active=False)
+        except Exception:
+            resp_data['status_code'] = -2
+            resp_data['msg'] = '未知错误'
+            return Response(resp_data)
+
+        # 生成激活链接
+        s = TimedJSONWebSignatureSerializer(settings.SECRET_KEY, 60 * 60 * 24)
+        info = {'user_id': user_obj.id}
+        token = s.dumps(info).decode('utf8')  # bytes -> utf8
+
+        # 发送激活邮件
+        active_url = settings.BASE_WEB_URL + 'api/user/active?token=' + token
+        send_email.delay('激活你的账号', '', [email], 'email_user_active.html',
+                         {'username': username, 'email': email, 'active_url': active_url})
+
+        # 返回用户信息
+        resp_data['status_code'] = 0
+        resp_data['msg'] = '成功，已发送激活邮件'
+        resp_data['data'] = {
+            'user_id': user_obj.id,
+            'username': user_obj.username,
+            'email': user_obj.email,
+            'gender': user_obj.gender,
+            'description': user_obj.description,
+            'reg_datetime': user_obj.reg_datetime,
+            'avatar_path': user_obj.avatar_path,
+            'last_login_datetime': user_obj.last_login_datetime,
+            'level': user_obj.level,
+            'exp_val': user_obj.exp_val,
+            'food_num': user_obj.food_num,
+            'is_mute': user_obj.is_mute,
+            'is_active': user_obj.is_active,
+            'extra_data': user_obj.extra_data
+        }
+
+        return Response(resp_data)

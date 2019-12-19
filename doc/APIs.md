@@ -14,7 +14,7 @@
 
 ```json
 POST
-/api/util/get_csrf_token
+/api/util/csrf_token/
 Content-Type: application/json
 ```
 
@@ -54,7 +54,7 @@ Content-Type: application/json
 
 ```json
 GET
-/api/util/get_verify_code
+/api/util/verify_code_img/
 ```
 
 **参数说明**
@@ -86,7 +86,7 @@ GET
 
 ```json
 POST
-/api/user
+/api/user/
 Content-Type: application/x-www-form-urlencoded
 ```
 
@@ -147,7 +147,7 @@ Content-Type: application/x-www-form-urlencoded
 
 ```json
 POST
-/api/user/login
+/api/user/login/
 Content-Type: application/x-www-form-urlencoded
 ```
 

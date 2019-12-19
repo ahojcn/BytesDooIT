@@ -7,24 +7,25 @@ from django.middleware.csrf import get_token
 from django.views.decorators.csrf import csrf_exempt
 from django.http.response import HttpResponse
 
-from rest_framework.views import View
+from rest_framework.views import APIView
 from rest_framework.response import Response
 
 
-class CSRFTokenView(View):
+class CSRFTokenView(APIView):
 
-    @csrf_exempt
+    # @csrf_exempt
     def post(self, request):
         """
         获取 csrf token
         """
         resp_data = {'status': 0, 'msg': 'success', 'data': {}}
-        get_token(request)
+        token = get_token(request)
         resp_obj = Response(resp_data)
+        resp_obj.set_cookie('X-CSRFToken', token)
         return resp_obj
 
 
-class VerifyCodeImgView(View):
+class VerifyCodeImgView(APIView):
 
     def get(self, request):
         """
