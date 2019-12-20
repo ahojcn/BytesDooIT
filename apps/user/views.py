@@ -222,6 +222,23 @@ class UserSession(APIView):
 
         return Response(resp_data)
 
+    def get(self, request):
+        """
+        获取会话信息（判断是否已登录）
+        """
+        username = request.session.get('username')
+
+        resp_data = {'status_code': 0, 'msg': '成功', 'data': {}}
+
+        if username is None:
+            resp_data['status_code'] = 0
+            resp_data['msg'] = '未登录'
+            resp_data['data'] = {
+                'is_login': False
+            }
+
+        return Response(resp_data)
+
     def delete(self, request):
         """
         登出

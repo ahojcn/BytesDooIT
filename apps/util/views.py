@@ -13,12 +13,12 @@ from rest_framework.response import Response
 
 class CSRFTokenView(APIView):
 
-    # @csrf_exempt
+    @csrf_exempt
     def post(self, request):
         """
         获取 csrf token
         """
-        resp_data = {'status': 0, 'msg': 'success', 'data': {}}
+        resp_data = {'status': 0, 'msg': '成功', 'data': {}}
         token = get_token(request)
         resp_obj = Response(resp_data)
         resp_obj.set_cookie('X-CSRFToken', token)
