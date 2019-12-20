@@ -235,7 +235,7 @@ class UserSession(APIView):
             'extra_data': user_obj.extra_data
         }
 
-        return Response(resp_data)
+        return Response(resp_data, status=200)
 
     def get(self, request):
         """
@@ -250,6 +250,36 @@ class UserSession(APIView):
             resp_data['msg'] = '未登录'
             resp_data['data'] = {
                 'is_login': False
+            }
+        else:
+            user_obj_set = User.objects.filter(username=username)
+            if len(user_obj_set) == 0:
+                resp_data['status_code'] = -1
+                resp_data['msg'] = '未登录'
+                resp_data['data'] = {
+                    'is_login': False
+                }
+                return Response(resp_data)
+
+            user_obj = user_obj_set.get(username=username)
+            resp_data['status_code'] = 0
+            resp_data['msg'] = '已登录'
+            resp_data['data'] = {
+                'is_login': True,
+                'user_id': user_obj.id,
+                'username': user_obj.username,
+                'email': user_obj.email,
+                'gender': user_obj.gender,
+                'description': user_obj.description,
+                'reg_datetime': user_obj.reg_datetime,
+                'avatar_path': user_obj.avatar_path,
+                'last_login_datetime': user_obj.last_login_datetime,
+                'level': user_obj.level,
+                'exp_val': user_obj.exp_val,
+                'food_num': user_obj.food_num,
+                'is_mute': user_obj.is_mute,
+                'is_active': user_obj.is_active,
+                'extra_data': user_obj.extra_data
             }
 
         return Response(resp_data)
