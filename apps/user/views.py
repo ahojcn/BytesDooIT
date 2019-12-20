@@ -1,5 +1,6 @@
 import re
 import hashlib
+import datetime
 
 from django.conf import settings
 from django.shortcuts import redirect
@@ -174,8 +175,10 @@ class UserSession(APIView):
         """
         登录
         """
+        global username
         is_username = request.data.get('is_username')
         pwd = request.data.get('pwd')
+        local_time = request.data.get('local_time')
 
         resp_data = {'status_code': 0, 'msg': '成功', 'data': {}}
 
@@ -188,15 +191,27 @@ class UserSession(APIView):
         is_username = bool(is_username)
         if is_username is True:
             username = request.data.get('username')
-            user_obj = User.objects.filter(username=username)
+            user_obj_set = User.objects.filter(username=username)
         else:
             email = request.data.get('email')
-            user_obj = User.objects.filter(email=email)
+            user_obj_set = User.objects.filter(email=email)
 
-        if len(user_obj) == 0:
+        if len(user_obj_set) == 0:
             resp_data['status_code'] = -1
             resp_data['msg'] = '用户名或邮箱有误'
             return Response(resp_data)
+
+        user_obj = user_obj_set.get(username=username)
+        # 校验密码是否匹配
+        pwd_md5 = hashlib.md5(pwd.encode('utf-8')).hexdigest()
+        if pwd_md5 != user_obj.password:
+            resp_data['status_code'] = -1
+            resp_data['msg'] = '密码有误'
+            return Response(resp_data)
+
+        # 用户名密码正确，记录登录时间
+        user_obj.last_login_datetime = datetime.datetime.fromtimestamp(int(local_time))
+        user_obj.save()
 
         # 记住登录状态
         request.session['username'] = user_obj.username
