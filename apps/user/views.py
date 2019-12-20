@@ -2,6 +2,7 @@ import re
 import hashlib
 
 from django.conf import settings
+from django.shortcuts import redirect
 from itsdangerous import TimedJSONWebSignatureSerializer, SignatureExpired
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -138,7 +139,7 @@ class UserActive(APIView):
             user_obj.save()
 
             resp_data['status_code'] = 0
-            resp_data['msg'] = '成功，已发送激活邮件'
+            resp_data['msg'] = '成功'
             resp_data['data'] = {
                 'user_id': user_obj.id,
                 'username': user_obj.username,
@@ -165,3 +166,67 @@ class UserActive(APIView):
             resp_data['msg'] = '未知错误'
         finally:
             return Response(resp_data)
+
+
+class UserSession(APIView):
+
+    def post(self, request):
+        """
+        登录
+        """
+        is_username = request.data.get('is_username')
+        pwd = request.data.get('pwd')
+
+        resp_data = {'status_code': 0, 'msg': '成功', 'data': {}}
+
+        # 参数校验
+        if not all([is_username, pwd]):
+            resp_data['status_code'] = -1
+            resp_data['msg'] = '参数不足'
+            return Response(resp_data)
+
+        is_username = bool(is_username)
+        if is_username is True:
+            username = request.data.get('username')
+            user_obj = User.objects.filter(username=username)
+        else:
+            email = request.data.get('email')
+            user_obj = User.objects.filter(email=email)
+
+        if len(user_obj) == 0:
+            resp_data['status_code'] = -1
+            resp_data['msg'] = '用户名或邮箱有误'
+            return Response(resp_data)
+
+        # 记住登录状态
+        request.session['username'] = user_obj.username
+
+        resp_data['status_code'] = 0
+        resp_data['msg'] = '成功'
+        resp_data['data'] = {
+            'user_id': user_obj.id,
+            'username': user_obj.username,
+            'email': user_obj.email,
+            'gender': user_obj.gender,
+            'description': user_obj.description,
+            'reg_datetime': user_obj.reg_datetime,
+            'avatar_path': user_obj.avatar_path,
+            'last_login_datetime': user_obj.last_login_datetime,
+            'level': user_obj.level,
+            'exp_val': user_obj.exp_val,
+            'food_num': user_obj.food_num,
+            'is_mute': user_obj.is_mute,
+            'is_active': user_obj.is_active,
+            'extra_data': user_obj.extra_data
+        }
+
+        return Response(resp_data)
+
+    def delete(self, request):
+        """
+        登出
+        """
+        # 删除所有 session
+        request.session.flush()
+
+        return redirect(settings.BASE_WEB_URL)
