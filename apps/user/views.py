@@ -3,7 +3,6 @@ import hashlib
 import datetime
 
 from django.conf import settings
-from django.shortcuts import redirect
 from itsdangerous import TimedJSONWebSignatureSerializer, SignatureExpired
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -179,13 +178,19 @@ class UserSession(APIView):
         is_username = request.data.get('is_username')
         pwd = request.data.get('pwd')
         local_time = request.data.get('local_time')
+        verify_code = request.data.get('verify_code')
 
         resp_data = {'status_code': 0, 'msg': '成功', 'data': {}}
 
         # 参数校验
-        if not all([is_username, pwd]):
+        if not all([is_username, pwd, local_time, verify_code]):
             resp_data['status_code'] = -1
             resp_data['msg'] = '参数不足'
+            return Response(resp_data)
+
+        if not check_verify_code(request, verify_code):
+            resp_data['status_code'] = -1
+            resp_data['msg'] = '验证码错误'
             return Response(resp_data)
 
         is_username = bool(is_username)
@@ -291,4 +296,6 @@ class UserSession(APIView):
         # 删除所有 session
         request.session.flush()
 
-        return redirect(settings.BASE_WEB_URL)
+        resp_data = {'status_code': 0, 'msg': '成功', 'data': {}}
+
+        return Response(resp_data)
