@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>用户激活</title>
+</head>
+<body>
+
+{% if status_code == 0 %}
+    激活成功，欢迎归队 {{ data.username }}。
+{% else %}
+    激活失败，{{ msg }}，请登录后重新发送激活邮件。
+{% endif %}
+
+</body>
+</html>

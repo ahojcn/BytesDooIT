@@ -13,7 +13,7 @@ class User(models.Model):
     gender = models.SmallIntegerField(default=0, choices=USER_GENDER_CHOICES, verbose_name='性别')
     description = models.CharField(null=True, blank=True, max_length=256, default='这个人很懒，什么都没留下。', verbose_name='简介/签名')
     reg_datetime = models.DateTimeField(auto_now_add=True, verbose_name='注册时间')
-    avatar_path = models.CharField(default='/media/img/default_avatar.png', max_length=1024, verbose_name='头像地址')
+    avatar_path = models.CharField(default='media/img/default_avatar.png', max_length=1024, verbose_name='头像地址')
     last_login_datetime = models.DateTimeField(auto_now=True, verbose_name='上次登录时间')
     level = models.SmallIntegerField(default=0, verbose_name='等级')
     exp_val = models.IntegerField(default=0, verbose_name='经验值')

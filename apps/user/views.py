@@ -3,6 +3,7 @@ import hashlib
 import datetime
 
 from django.conf import settings
+from django.shortcuts import render
 from itsdangerous import TimedJSONWebSignatureSerializer, SignatureExpired
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -128,7 +129,7 @@ class UserActive(APIView):
 
         if token is None:
             # token 不存在
-            return Response('链接失效')
+            return Response('链接失效', status=404)
 
         resp_data = {'status_code': 0, 'msg': '成功', 'data': {}}
 
@@ -166,7 +167,7 @@ class UserActive(APIView):
             resp_data['status_code'] = -2
             resp_data['msg'] = '未知错误'
         finally:
-            return Response(resp_data)
+            return render(request, 'user_active.html', resp_data)
 
 
 class UserSession(APIView):
