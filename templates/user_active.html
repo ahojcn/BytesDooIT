@@ -7,10 +7,24 @@
 <body>
 
 {% if status_code == 0 %}
-    激活成功，欢迎归队 {{ data.username }}。
+    激活成功，欢迎归队 {{ data.username }}，<span id="time" style="color: red"></span>。
 {% else %}
-    激活失败，{{ msg }}，请登录后重新发送激活邮件。
+    激活失败，{{ msg }}，请登录后重新发送激活邮件，<span id="time" style="color: red"></span>。
 {% endif %}
+
+<script>
+    let cnt = 3;
+    let total = 3;
+    let time = document.querySelector('span#time');
+    time.textContent = cnt + ' 秒后跳转到首页';
+    setInterval(() => {
+        cnt -= 1;
+        time.textContent = cnt + ' 秒后跳转到首页';
+        if (cnt === 0) {
+            window.location = 'http://127.0.0.1:8080';
+        }
+    }, total * 1000)
+</script>
 
 </body>
 </html>
