@@ -9,12 +9,13 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from user.models import User
-from util.glob import check_verify_code
+from util.glob import need_verify_code
 from util.celery_tasks import tasks
 
 
 class UserView(APIView):
 
+    @need_verify_code
     def post(self, request):
         """
         用户注册
@@ -29,11 +30,10 @@ class UserView(APIView):
         email = request.data.get('email')
         pwd = request.data.get('pwd')
         c_pwd = request.data.get('c_pwd')
-        verify_code = request.data.get('verify_code')
         is_agree = request.data.get('is_agree')
 
         # 数据校验
-        if not all([username, email, pwd, c_pwd, verify_code, is_agree]):
+        if not all([username, email, pwd, c_pwd, is_agree]):
             resp_data['status_code'] = -1
             resp_data['msg'] = '参数不足'
             return Response(resp_data)
@@ -46,11 +46,6 @@ class UserView(APIView):
         if pwd != c_pwd:
             resp_data['status_code'] = -1
             resp_data['msg'] = '两次输入密码不一致'
-            return Response(resp_data)
-
-        if not check_verify_code(request, verify_code):
-            resp_data['status_code'] = -1
-            resp_data['msg'] = '验证码错误'
             return Response(resp_data)
 
         if not re.match(r'^[a-zA-Z0-9_-]{4,16}$$', username):
@@ -172,6 +167,7 @@ class UserActive(APIView):
 
 class UserSession(APIView):
 
+    @need_verify_code
     def post(self, request):
         """
         登录
@@ -180,19 +176,13 @@ class UserSession(APIView):
         is_username = request.data.get('is_username')
         pwd = request.data.get('pwd')
         local_time = request.data.get('local_time')
-        verify_code = request.data.get('verify_code')
 
         resp_data = {'status_code': 0, 'msg': '成功', 'data': {}}
 
         # 参数校验
-        if not all([is_username, pwd, local_time, verify_code]):
+        if not all([is_username, pwd, local_time]):
             resp_data['status_code'] = -1
             resp_data['msg'] = '参数不足'
-            return Response(resp_data)
-
-        if not check_verify_code(request, verify_code):
-            resp_data['status_code'] = -1
-            resp_data['msg'] = '验证码错误'
             return Response(resp_data)
 
         is_username = bool(is_username)
