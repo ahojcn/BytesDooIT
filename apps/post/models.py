@@ -7,8 +7,8 @@ class Post(models.Model):
     """
     文章表
     """
-    user_id = models.ForeignKey(to=User, on_delete=models.DO_NOTHING, related_name='user_post', null=False, blank=False,
-                                verbose_name='用户id')
+    user = models.ForeignKey(to=User, on_delete=models.DO_NOTHING, related_name='user_post', null=False, blank=False,
+                             verbose_name='用户id')
     title = models.CharField(null=False, blank=False, max_length=1024, verbose_name='文章标题')
     content = models.TextField(null=False, blank=False, verbose_name='文章内容')
     create_datetime = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
