@@ -36,9 +36,7 @@ Content-Type: application/json
 
 **返回值说明**
 
-| 参数名 | 含义              |
-| ------ | ----------------- |
-| token  | 获取到的 token 值 |
+无
 
 **备注**
 

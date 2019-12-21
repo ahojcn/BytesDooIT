@@ -7,7 +7,7 @@ class User(models.Model):
     """
     username = models.CharField(max_length=128, unique=True, verbose_name='用户名', null=False)
     email = models.CharField(max_length=128, unique=True, verbose_name='邮箱')
-    phone_num = models.CharField(max_length=20, unique=True, verbose_name='手机号')
+    phone_num = models.CharField(max_length=20, null=True, blank=True, verbose_name='手机号')
     password = models.CharField(null=False, blank=False, max_length=128, verbose_name='密码')
     USER_GENDER_CHOICES = ((0, '保密'), (1, '男'), (2, '女'))
     gender = models.SmallIntegerField(default=0, choices=USER_GENDER_CHOICES, verbose_name='性别')

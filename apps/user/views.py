@@ -37,7 +37,7 @@ class UserView(APIView):
             resp_data['msg'] = '参数不足'
             return Response(resp_data)
 
-        if is_agree is None or int(is_agree) == 0:
+        if is_agree is None or bool(is_agree) is False:
             resp_data['status_code'] = -1
             resp_data['msg'] = '请先同意用户协议'
             return Response(resp_data)
@@ -76,7 +76,8 @@ class UserView(APIView):
         pwd_md5 = hashlib.md5(pwd.encode('utf-8')).hexdigest()
         try:
             user_obj = User.objects.create(username=username, password=pwd_md5, email=email, is_active=False)
-        except Exception:
+        except Exception as e:
+            print(e)
             resp_data['status_code'] = -2
             resp_data['msg'] = '未知错误'
             return Response(resp_data)
@@ -112,7 +113,7 @@ class UserView(APIView):
         }
 
         # 设置 session 记住登录
-        request.session['is_login'] = True
+        request.session['username'] = user_obj.username
 
         return Response(resp_data)
 
@@ -174,7 +175,7 @@ class UserSession(APIView):
         """
         登录
         """
-        global username
+        username = None
         is_username = request.data.get('is_username')
         pwd = request.data.get('pwd')
         local_time = request.data.get('local_time')
