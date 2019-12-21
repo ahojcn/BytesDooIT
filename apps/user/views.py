@@ -116,6 +116,33 @@ class UserView(APIView):
 
 class UserActive(APIView):
 
+    def post(self, request):
+        """
+        重新发送激活邮件
+        """
+        username = request.session.get('username')
+        print(username)
+        resp_data = {'status_code': 0, 'msg': '成功', 'data': {}}
+
+        if username is None:
+            resp_data['status_code'] = -1
+            resp_data['msg'] = '未登录'
+            return Response(resp_data)
+
+        user_obj = User.objects.get(username=username)
+        # 生成激活链接
+        s = TimedJSONWebSignatureSerializer(settings.SECRET_KEY, 60 * 60 * 24)
+        info = {'user_id': user_obj.id}
+        token = s.dumps(info).decode('utf8')  # bytes -> utf8
+
+        # 发送激活邮件
+        active_url = settings.BASE_WEB_URL + 'api/user/active/?token=' + token
+        tasks.send_email.delay('激活你的账号', '', [user_obj.email], 'email_user_active.html',
+                               {'username': username, 'email': user_obj.email, 'active_url': active_url})
+
+        resp_data['msg'] = '已发送激活邮件，请注意查收'
+        return Response(resp_data)
+
     def get(self, request):
         """
         用户激活
