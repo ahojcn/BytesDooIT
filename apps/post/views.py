@@ -27,6 +27,7 @@ class PostView(APIView):
         page_size = int(request.query_params.get('page_size', 10))
 
         posts = Post.objects.filter(is_delete=False, is_draft=False).order_by('update_datetime')
+        total_post = len(posts)
         paged_posts = Paginator(posts, page_size)
 
         posts = paged_posts.get_page(page_index)
@@ -36,11 +37,13 @@ class PostView(APIView):
             'page_index': page_index,
             'page_size': page_size,
             'total_page': total_page,
+            'total_post': total_post,
             'posts': []
         }
 
         for p in posts:
             tmp = {
+                'post_id': p.id,
                 'username': p.user.username,
                 'title': p.title,
                 'content': p.content,
