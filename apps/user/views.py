@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from user.models import User
-from util.glob import need_verify_code
+from mauth.glob import need_verify_code, need_login
 from util.celery_tasks import tasks
 
 
@@ -116,6 +116,7 @@ class UserView(APIView):
 
 class UserActive(APIView):
 
+    @need_login
     def post(self, request):
         """
         重新发送激活邮件
@@ -308,6 +309,7 @@ class UserSession(APIView):
 
         return Response(resp_data)
 
+    @need_login
     def delete(self, request):
         """
         登出

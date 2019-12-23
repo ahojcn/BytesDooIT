@@ -74,8 +74,6 @@ GET
 
 无
 
-
-
 ### user
 
 #### 注册
@@ -99,8 +97,6 @@ Content-Type: application/x-www-form-urlencoded
 | verify_code | 是   | string | 验证码           |
 | is_agree    | 是   | bool   | 是否同意用户协议 |
 
-
-
 **返回值示例**
 
 ```json
@@ -112,8 +108,6 @@ Content-Type: application/x-www-form-urlencoded
   }
 }
 ```
-
-
 
 **返回值说明**
 
@@ -131,13 +125,9 @@ Content-Type: application/x-www-form-urlencoded
 | is_mute         | bool   | 是否禁言      |
 | is_active       | bool   | 是否激活      |
 
-
-
 **备注**
 
 用户需查看邮箱激活邮件并点击链接进行激活。
-
-
 
 #### 登录
 
@@ -146,10 +136,7 @@ Content-Type: application/x-www-form-urlencoded
 ```json
 POST
 /api/user/login/
-Content-Type: application/x-www-form-urlencoded
 ```
-
-
 
 **参数说明**
 
@@ -161,25 +148,17 @@ Content-Type: application/x-www-form-urlencoded
 | pwd         | 是   | string | 密码         |
 | verify_code | 是   | string | 验证码       |
 
-
-
 **返回值示例**
 
-```json
-
-```
-
-
+Xxx
 
 **返回值说明**
 
-| 参数 | 类型 | 说明 |
-| ---- | ---- | ---- |
-|      |      |      |
-
-
+xxx
 
 **备注**
 
 无
+
+### post
 
