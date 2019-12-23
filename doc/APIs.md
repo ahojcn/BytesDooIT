@@ -150,7 +150,7 @@ POST
 
 **返回值示例**
 
-Xxx
+xxx
 
 **返回值说明**
 
@@ -161,4 +161,14 @@ xxx
 无
 
 ### post
+
+需要参数：
+
+```json
+title str 文章标题
+content str 文章正文
+is_draft bool 是否为草稿
+tags ['', '', ''] 标签列表
+category ['', '', ''] 分类列表
+```
 

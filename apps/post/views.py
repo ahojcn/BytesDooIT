@@ -103,15 +103,40 @@ class PostView(APIView):
         title = request.data.get('title')
         content = request.data.get('content')
         is_draft = request.data.get('is_draft')
+        tags = request.data.get('tags')
+        category = request.data.get('category')
 
-        if not all([title, content, not is_draft]):
+        # 参数校验
+        if not all([title, content]) or is_draft is None:
             resp_data['status_code'] = -1
             resp_data['msg'] = '参数不足'
             return Response(resp_data)
 
+        # 获取用户对象
         user_obj = User.objects.get(username=username)
-
+        # 新建 post
         post_obj = Post.objects.create(user=user_obj, title=title, content=content, is_draft=is_draft)
+
+        t_data = []
+        # 添加 tag
+        for t in tags:
+            tmp = PostTag.objects.create(user_id=user_obj, post_id=post_obj, name=t)
+            t_data.append({
+                'tag_id': tmp.id,
+                'name': tmp.name,
+                'create_datetime': tmp.create_datetime,
+                'extra_data': tmp.extra_data
+            })
+        c_data = []
+        # 添加 category
+        for c in category:
+            tmp = PostCategory.objects.create(user_id=user_obj, post_id=post_obj, name=c)
+            c_data.append({
+                'category_id': tmp.id,
+                'name': tmp.name,
+                'create_datetime': tmp.create_datetime,
+                'extra_data': tmp.extra_data
+            })
 
         resp_data['data'] = {
             'username': post_obj.user.username,
@@ -123,7 +148,9 @@ class PostView(APIView):
             'like_count': post_obj.like_count,
             'is_draft': post_obj.is_draft,
             'food_count': post_obj.food_count,
-            'extra_data': post_obj.extra_data
+            'extra_data': post_obj.extra_data,
+            'tags': t_data,
+            'category': c_data
         }
 
         return Response(resp_data)
