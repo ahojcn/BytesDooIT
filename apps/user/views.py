@@ -15,6 +15,8 @@ from util.celery_tasks import tasks
 
 class UserView(APIView):
 
+    # todo get 获取用户信息
+
     @need_verify_code
     def post(self, request):
         """

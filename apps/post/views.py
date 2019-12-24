@@ -16,6 +16,7 @@ class PostCategoryView(APIView):
         """
         获取用户的文章分类
         """
+        # todo 获取单个分类信息
         resp_data = {'status_code': 0, 'msg': '成功', 'data': []}
 
         user_id = request.query_params.get('user_id')
@@ -53,21 +54,24 @@ class PostView(APIView):
 
     def get(self, request):
         """
-        获取最新文章，分页
+        有 id 参数
+            获取单个文章信息
+        否则
+            分页获取所有文章
         """
         resp_data = {'status_code': 0, 'msg': '成功', 'data': {}}
-
-        # from user.models import User
-        # import random
-        # u = User.objects.get(username='ahojcn0')
-        # Post.objects.create(user=u, title=str(random.randrange(0, 100000)), content='123')
 
         # 当前页
         page_index = int(request.query_params.get('page_index', 1))
         # 每页大小
         page_size = int(request.query_params.get('page_size', 10))
 
-        posts = Post.objects.filter(is_delete=False, is_draft=False).order_by('-update_datetime')
+        post_id = request.query_params.get('post_id')
+        if post_id is not None:
+            posts = Post.objects.filter(id=post_id, is_delete=False, is_draft=False)
+        else:
+            posts = Post.objects.filter(is_delete=False, is_draft=False).order_by('-update_datetime')
+
         total_post = len(posts)
         paged_posts = Paginator(posts, page_size)
 
