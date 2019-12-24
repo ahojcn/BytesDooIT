@@ -83,7 +83,27 @@ class PostView(APIView):
         }
 
         for p in posts:
-            tmp = {
+            # 获取分类信息
+            pc = PostCategory.objects.filter(post_id=p.id)
+            pcl = []
+            for i in pc:
+                pcl.append({
+                    'id': i.id,
+                    'name': i.name,
+                    'create_datetime': i.create_datetime,
+                    'extra_data': i.extra_data
+                })
+            # 获取标签信息
+            pt = PostTag.objects.filter(post_id=p.id)
+            ptl = []
+            for i in pt:
+                ptl.append({
+                    'id': i.id,
+                    'name': i.name,
+                    'create_datetime': i.create_datetime,
+                    'extra_data': i.extra_data
+                })
+            resp_data['data']['posts'].append({
                 'post_id': p.id,
                 'username': p.user.username,
                 'title': p.title,
@@ -93,8 +113,9 @@ class PostView(APIView):
                 'like_count': p.like_count,
                 'food_count': p.food_count,
                 'extra_data': p.extra_data,
-            }
-            resp_data['data']['posts'].append(tmp)
+                'category': pcl,
+                'tags': ptl
+            })
 
         return Response(resp_data)
 
