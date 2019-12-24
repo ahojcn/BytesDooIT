@@ -26,7 +26,14 @@ class PostCategoryView(APIView):
             return Response(resp_data)
 
         user_obj = User.objects.get(id=user_id)
-        pcl = PostCategory.objects.filter(user_id=user_obj, is_delete=False)
+
+        # 去重
+        pc_name_l = PostCategory.objects.filter(user_id=user_obj, is_delete=False).values('name').distinct()
+        pcl = []
+        for i in pc_name_l:
+            pcl.append(PostCategory.objects.filter(name=i.get('name')).first())
+
+        # pcl = PostCategory.objects.filter(user_id=user_obj, is_delete=False)
 
         for pc in pcl:
             tmp = {
