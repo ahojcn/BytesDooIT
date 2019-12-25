@@ -50,6 +50,84 @@ class PostCategoryView(APIView):
         return Response(resp_data)
 
 
+class PostFoodView(APIView):
+
+    @need_login
+    def post(self, request):
+        """
+        投喂文章辣条
+        """
+        resp_data = {'status_code': 0, 'msg': '成功', 'data': {}}
+
+        from_username = request.session.get('username')
+        post_id = request.data.get('post_id')
+
+        if not all([post_id, from_username]):
+            resp_data['status_code'] = -1
+            resp_data['msg'] = '参数不足'
+            return Response(resp_data)
+
+        from_user = User.objects.get(username=from_username)
+        post_obj = Post.objects.get(id=post_id)
+
+        # 拒绝自己给自己投喂
+        if from_user.username == post_obj.user.username:
+            resp_data['status_code'] = -1
+            resp_data['msg'] = '不能给自己投喂哟'
+            return Response(resp_data)
+
+        # todo 查看自己辣条数够不够
+        if from_user.food_num == 0:
+            resp_data['status_code'] = -1
+            resp_data['msg'] = '你没有辣条啦'
+            return Response(resp_data)
+
+        # 投喂者辣条减少
+        from_user.food_num -= 1
+        from_user.save()
+        # 文章辣条数增加
+        post_obj.food_count += 1
+        post_obj.save()
+        # 用户辣条数增加
+        post_obj.user.food_num += 1
+        post_obj.user.save()
+
+        return Response(resp_data)
+
+
+class PostLikeView(APIView):
+
+    @need_login
+    def post(self, request):
+        """
+        给文章点赞
+        """
+        resp_data = {'status_code': 0, 'msg': '成功', 'data': {}}
+
+        from_username = request.session.get('username')
+        post_id = request.data.get('post_id')
+
+        if not all([post_id, from_username]):
+            resp_data['status_code'] = -1
+            resp_data['msg'] = '参数不足'
+            return Response(resp_data)
+
+        from_user = User.objects.get(username=from_username)
+        post_obj = Post.objects.get(id=post_id)
+
+        # 拒绝自己给自己投喂
+        if from_user.username == post_obj.user.username:
+            resp_data['status_code'] = -1
+            resp_data['msg'] = '不能给自己点赞哟'
+            return Response(resp_data)
+
+        # 文章辣条数增加
+        post_obj.like_count += 1
+        post_obj.save()
+
+        return Response(resp_data)
+
+
 class PostView(APIView):
 
     def get(self, request):
@@ -70,7 +148,7 @@ class PostView(APIView):
         if post_id is not None:
             posts = Post.objects.filter(id=post_id, is_delete=False, is_draft=False)
         else:
-            posts = Post.objects.filter(is_delete=False, is_draft=False).order_by('-update_datetime')
+            posts = Post.objects.filter(is_delete=False, is_draft=False).order_by('-create_datetime')
 
         total_post = len(posts)
         paged_posts = Paginator(posts, page_size)
