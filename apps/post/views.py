@@ -76,7 +76,6 @@ class PostFoodView(APIView):
             resp_data['msg'] = '不能给自己投喂哟'
             return Response(resp_data)
 
-        # todo 查看自己辣条数够不够
         if from_user.food_num == 0:
             resp_data['status_code'] = -1
             resp_data['msg'] = '你没有辣条啦'
@@ -136,6 +135,8 @@ class PostView(APIView):
             获取单个文章信息
         否则
             分页获取所有文章
+
+        文章信息带作者信息
         """
         resp_data = {'status_code': 0, 'msg': '成功', 'data': {}}
 
@@ -187,7 +188,17 @@ class PostView(APIView):
                 })
             resp_data['data']['posts'].append({
                 'post_id': p.id,
-                'username': p.user.username,
+                'user_data': {
+                    'username': p.user.username,
+                    'email': p.user.email,
+                    'desc': p.user.description,
+                    'reg_time': p.user.reg_datetime,
+                    'avatar': p.user.avatar_path,
+                    'level': p.user.level,
+                    'exp_val': p.user.exp_val,
+                    'food_num': p.user.food_num,
+                    'extra_data': p.user.extra_data
+                },
                 'title': p.title,
                 'content': p.content,
                 'create_datetime': p.create_datetime,
@@ -208,23 +219,57 @@ class PostView(APIView):
         """
         username = request.session.get('username')
 
-        resp_data = {'status_code': 0, 'msg': '发布成功', 'data': {}}
+        resp_data = {'status_code': 0, 'msg': '成功', 'data': {}}
 
         title = request.data.get('title')
         content = request.data.get('content')
-        is_draft = request.data.get('is_draft')
         tags = request.data.get('tags')
         category = request.data.get('category')
+        is_draft = request.data.get('is_draft')
 
         # 参数校验
         if not all([title, content]) or is_draft is None:
             resp_data['status_code'] = -1
-            resp_data['msg'] = '参数不足'
+            resp_data['msg'] = '写一点什么吧'
             return Response(resp_data)
 
         # 获取用户对象
         user_obj = User.objects.get(username=username)
-        # 新建 post
+
+        # 保存为草稿
+        if is_draft is True:
+            # 获取文章 id
+            post_id = request.data.get('post_id')
+            if post_id is None:
+                # 新建文章
+                post_obj = Post.objects.create(
+                    user=user_obj,
+                    title=title,
+                    content=content,
+                    is_draft=True
+                )
+            else:
+                post_obj = Post.objects.get(id=post_id)
+                post_obj.title = title
+                post_obj.content = content
+                post_obj.save()
+            resp_data['status_code'] = 0
+            resp_data['msg'] = '保存成功'
+            resp_data['data'] = {
+                'username': post_obj.user.username,
+                'post_id': post_obj.id,
+                'title': post_obj.title,
+                'content': post_obj.content,
+                'create_datetime': post_obj.create_datetime,
+                'update_datetime': post_obj.update_datetime,
+                'like_count': post_obj.like_count,
+                'is_draft': post_obj.is_draft,
+                'food_count': post_obj.food_count,
+                'extra_data': post_obj.extra_data,
+            }
+            return Response(resp_data)
+
+        # 新建文章 post
         post_obj = Post.objects.create(user=user_obj, title=title, content=content, is_draft=is_draft)
 
         t_data = []
