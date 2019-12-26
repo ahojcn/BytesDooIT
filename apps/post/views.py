@@ -94,6 +94,37 @@ class PostFoodView(APIView):
         return Response(resp_data)
 
 
+class PostImageView(APIView):
+
+    @need_login
+    def post(self, request):
+        """
+        文章上传图片
+        """
+        resp_data = {'status_code': 0, 'msg': '成功', 'data': {}}
+
+        f = request.FILES.get('img')
+
+        if not f:
+            resp_data['status_code'] = -1
+            resp_data['msg'] = '参数不足'
+            return Response(resp_data)
+
+        # todo 1. 上传到分布式文件服务器上
+        # todo 2. 文件重命名，防止冲突
+        fname = settings.MEDIA_ROOT + '/' + f.name
+
+        with open(fname, 'wb') as img:
+            for c in f.chunks():
+                img.write(c)
+
+        resp_data['msg'] = '上传成功'
+        resp_data['data'] = {
+            'img_url': settings.BASE_WEB_URL + 'media/' + f.name,
+        }
+        return Response(resp_data)
+
+
 class PostLikeView(APIView):
 
     @need_login
