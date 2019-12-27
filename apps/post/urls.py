@@ -5,7 +5,8 @@ from post.views import (
     PostCategoryView,
     PostFoodView,
     PostLikeView,
-    PostImageView
+    PostImageView,
+    PostAdminView,
 )
 
 urlpatterns = [
@@ -14,4 +15,5 @@ urlpatterns = [
     path('food/', PostFoodView.as_view()),
     path('like/', PostLikeView.as_view()),
     path('img/', PostImageView.as_view()),
+    path('draft/', PostAdminView.as_view()),
 ]

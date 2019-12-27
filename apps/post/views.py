@@ -158,11 +158,71 @@ class PostLikeView(APIView):
         return Response(resp_data)
 
 
+class PostAdminView(APIView):
+
+    @need_login
+    def get(self, request):
+        """
+        有 post id 参数
+            获取单个文章信息
+        否则
+            分页获取所有文章
+
+        获取自己的所有文章(分页)
+        不带作者信息，因为需要登录
+        """
+        username = request.session.get('username')
+
+        user_obj = User.objects.get(username=username)
+
+        resp_data = {'status_code': 0, 'msg': '成功', 'data': []}
+
+        # 当前页
+        page_index = int(request.query_params.get('page_index', 1))
+        # 每页大小
+        page_size = int(request.query_params.get('page_size', 10))
+
+        post_id = request.query_params.get('post_id')
+        if post_id is not None:
+            posts = Post.objects.filter(id=post_id, user=user_obj, is_delete=False)
+        else:
+            posts = Post.objects.filter(is_delete=False, user=user_obj).order_by('-create_datetime')
+
+        total_post = len(posts)
+        paged_posts = Paginator(posts, page_size)
+
+        posts = paged_posts.get_page(page_index)
+        total_page = paged_posts.num_pages
+
+        resp_data['data'] = {
+            'page_index': page_index,
+            'page_size': page_size,
+            'total_page': total_page,
+            'total_post': total_post,
+            'posts': []
+        }
+
+        for p in posts:
+            resp_data['data']['posts'].append({
+                'post_id': p.id,
+                'title': p.title,
+                'content': p.content,
+                'create_datetime': p.create_datetime,
+                'update_datetime': p.update_datetime,
+                'like_count': p.like_count,
+                'is_draft': p.is_draft,
+                'food_count': p.food_count,
+                'extra_data': p.extra_data
+            })
+
+        return Response(resp_data)
+
+
 class PostView(APIView):
 
     def get(self, request):
         """
-        有 id 参数
+        有 post id 参数
             获取单个文章信息
         否则
             分页获取所有文章
