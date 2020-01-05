@@ -29,11 +29,10 @@ class PostCategory(models.Model):
     """
     文章分类
     """
-    user_id = models.ForeignKey(to=User, on_delete=models.DO_NOTHING, related_name='user_post_category', null=False,
-                                blank=False, verbose_name='用户id')
-    post_id = models.ForeignKey(to=Post, on_delete=models.DO_NOTHING, related_name='post_post_category', null=False,
-                                blank=False,
-                                verbose_name='文章id')
+    user = models.ForeignKey(to=User, on_delete=models.DO_NOTHING, related_name='user_post_category', null=False,
+                             blank=False, verbose_name='用户id')
+    post = models.ForeignKey(to=Post, on_delete=models.DO_NOTHING, related_name='post_post_category', null=False,
+                             blank=False, verbose_name='文章id')
     name = models.CharField(null=False, blank=False, max_length=32, verbose_name='分类名')
     create_datetime = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
     extra_data = models.TextField(default='', verbose_name='额外信息')
@@ -49,10 +48,10 @@ class PostTag(models.Model):
     """
     文章标签表
     """
-    user_id = models.ForeignKey(to=User, on_delete=models.DO_NOTHING, related_name='user_post_tag', null=False,
-                                blank=False, verbose_name='用户id')
-    post_id = models.ForeignKey(to=Post, on_delete=models.DO_NOTHING, related_name='post_post_tag', null=False,
-                                blank=False, verbose_name='文章id')
+    user = models.ForeignKey(to=User, on_delete=models.DO_NOTHING, related_name='user_post_tag', null=False,
+                             blank=False, verbose_name='用户id')
+    post = models.ForeignKey(to=Post, on_delete=models.DO_NOTHING, related_name='post_post_tag', null=False,
+                             blank=False, verbose_name='文章id')
     name = models.CharField(null=False, blank=False, max_length=32, verbose_name='标签名')
     create_datetime = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
     extra_data = models.TextField(default='', verbose_name='额外信息')

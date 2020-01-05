@@ -16,7 +16,6 @@ class PostCategoryView(APIView):
         """
         获取用户的文章分类
         """
-        # todo 获取单个分类信息
         resp_data = {'status_code': 0, 'msg': '成功', 'data': []}
 
         user_id = request.query_params.get('user_id')
@@ -159,6 +158,39 @@ class PostLikeView(APIView):
 
 
 class PostAdminView(APIView):
+
+    @need_login
+    def post(self, request):
+        """
+        删除某个文章
+        param:
+            post_id
+        """
+        username = request.session.get('username')
+        user_obj = User.objects.get(username=username)
+        resp_data = {'status_code': 0, 'msg': '成功', 'data': []}
+        post_id = request.data.get('post_id')
+
+        if not post_id:
+            resp_data['status_code'] = -1
+            resp_data['msg'] = '参数不足'
+            return Response(resp_data)
+
+        post_obj = Post.objects.get(id=post_id)
+        post_obj.is_delete = True
+        post_obj.save()
+
+        pc_obj = PostCategory.objects.get(post=post_obj, user=user_obj)
+        pc_obj.is_delete = True
+        pc_obj.save()
+
+        pt_obj = PostTag.objects.get(post=post_obj, user=user_obj)
+        pt_obj.is_delete = True
+        pt_obj.save()
+
+        resp_data['msg'] = '删除成功'
+        resp_data['data'] = {}
+        return Response(resp_data)
 
     @need_login
     def get(self, request):
