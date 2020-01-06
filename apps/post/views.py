@@ -39,7 +39,7 @@ class PostCategoryView(APIView):
             tmp = {
                 'category_id': pc.id,
                 'user_id': user_obj.id,
-                'post_id': pc.post_id.id,
+                'post_id': pc.post.id,
                 'category_name': pc.name,
                 'create_datetime': pc.create_datetime,
                 'extra_data': pc.extra_data
@@ -180,13 +180,16 @@ class PostAdminView(APIView):
         post_obj.is_delete = True
         post_obj.save()
 
-        pc_obj = PostCategory.objects.get(post=post_obj, user=user_obj)
-        pc_obj.is_delete = True
-        pc_obj.save()
+        try:
+            pc_obj = PostCategory.objects.get(post=post_obj, user=user_obj)
+            pc_obj.is_delete = True
+            pc_obj.save()
 
-        pt_obj = PostTag.objects.get(post=post_obj, user=user_obj)
-        pt_obj.is_delete = True
-        pt_obj.save()
+            pt_obj = PostTag.objects.get(post=post_obj, user=user_obj)
+            pt_obj.is_delete = True
+            pt_obj.save()
+        except Exception:
+            pass
 
         resp_data['msg'] = '删除成功'
         resp_data['data'] = {}
@@ -269,10 +272,15 @@ class PostView(APIView):
         page_size = int(request.query_params.get('page_size', 10))
 
         post_id = request.query_params.get('post_id')
-        if post_id is not None:
-            posts = Post.objects.filter(id=post_id, is_delete=False, is_draft=False)
+        is_edit = request.query_params.get('is_edit')
+
+        if bool(is_edit) is True:
+            posts = Post.objects.filter(id=post_id, is_delete=False)
         else:
-            posts = Post.objects.filter(is_delete=False, is_draft=False).order_by('-create_datetime')
+            if post_id is not None:
+                posts = Post.objects.filter(id=post_id, is_delete=False, is_draft=False)
+            else:
+                posts = Post.objects.filter(is_delete=False, is_draft=False).order_by('-create_datetime')
 
         total_post = len(posts)
         paged_posts = Paginator(posts, page_size)
@@ -398,7 +406,7 @@ class PostView(APIView):
         t_data = []
         # 添加 tag
         for t in tags:
-            tmp = PostTag.objects.create(user_id=user_obj, post_id=post_obj, name=t)
+            tmp = PostTag.objects.create(user=user_obj, post=post_obj, name=t)
             t_data.append({
                 'tag_id': tmp.id,
                 'name': tmp.name,
@@ -408,7 +416,7 @@ class PostView(APIView):
         c_data = []
         # 添加 category
         for c in category:
-            tmp = PostCategory.objects.create(user_id=user_obj, post_id=post_obj, name=c)
+            tmp = PostCategory.objects.create(user=user_obj, post=post_obj, name=c)
             c_data.append({
                 'category_id': tmp.id,
                 'name': tmp.name,
