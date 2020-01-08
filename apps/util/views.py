@@ -54,6 +54,18 @@ class VerifyCodeImgView(APIView):
             fill = (random.randrange(0, 255), 255, random.randrange(0, 255))
             draw.point(xy, fill=fill)
 
+        # 绘制噪线
+        for i in range(50):
+            x1 = random.randint(0, width)
+            x2 = random.randint(0, width)
+            y1 = random.randint(0, height)
+            y2 = random.randint(0, height)
+
+            c1 = random.randint(0, 255)
+            c2 = random.randint(0, 255)
+            c3 = random.randint(0, 255)
+            draw.line((x1, y1, x2, y2), fill=(c1, c2, c3))
+
         # 验证码的备选值
         code = 'ABCD123EFGHIJK456LMNOPQRS789TUVWXYZ0qwertyuiopasdfghjklzxcvbnm'
         # 随机选取 4 个作为验证码
@@ -63,13 +75,15 @@ class VerifyCodeImgView(APIView):
 
         # 构造字体对象
         font = ImageFont.truetype('static/font/LatienneSwaT.ttf', height, encoding='unic')
-        # 构造字体颜色
-        font_color = (255, random.randrange(0, 255), random.randrange(0, 255))
         # 绘制 4 个字
-        draw.text((0, 0), rand_str[0], font=font, fill=font_color)
-        draw.text((width / 4, 0), rand_str[1], font=font, fill=font_color)
-        draw.text((width / 4 * 2, 0), rand_str[2], font=font, fill=font_color)
-        draw.text((width / 4 * 3, 0), rand_str[3], font=font, fill=font_color)
+        draw.text((0, 0), rand_str[0], font=font,
+                  fill=(255, random.randrange(0, 255), random.randrange(0, 255)))
+        draw.text((width / 4, 0), rand_str[1], font=font,
+                  fill=(255, random.randrange(0, 255), random.randrange(0, 255)))
+        draw.text((width / 4 * 2, 0), rand_str[2], font=font,
+                  fill=(255, random.randrange(0, 255), random.randrange(0, 255)))
+        draw.text((width / 4 * 3, 0), rand_str[3], font=font,
+                  fill=(255, random.randrange(0, 255), random.randrange(0, 255)))
 
         # 释放画笔
         del draw

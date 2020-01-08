@@ -162,9 +162,14 @@ class PostAdminView(APIView):
     @need_login
     def post(self, request):
         """
-        删除某个文章
-        param:
-            post_id
+        发布/保存草稿/删除 某个文章
+
+        参数：
+            post_id     文章id
+            title       标题
+            content     正文
+            is_delete   是否删除
+            is_draft    是否为草稿
         """
         username = request.session.get('username')
         user_obj = User.objects.get(username=username)
@@ -272,15 +277,10 @@ class PostView(APIView):
         page_size = int(request.query_params.get('page_size', 10))
 
         post_id = request.query_params.get('post_id')
-        is_edit = request.query_params.get('is_edit')
-
-        if bool(is_edit) is True:
-            posts = Post.objects.filter(id=post_id, is_delete=False)
+        if post_id is not None:
+            posts = Post.objects.filter(id=post_id, is_delete=False, is_draft=False)
         else:
-            if post_id is not None:
-                posts = Post.objects.filter(id=post_id, is_delete=False, is_draft=False)
-            else:
-                posts = Post.objects.filter(is_delete=False, is_draft=False).order_by('-create_datetime')
+            posts = Post.objects.filter(is_delete=False, is_draft=False).order_by('-create_datetime')
 
         total_post = len(posts)
         paged_posts = Paginator(posts, page_size)
@@ -347,6 +347,13 @@ class PostView(APIView):
     def post(self, request):
         """
         新增文章
+
+        参数：
+            title       文章标题
+            content     正文
+            tags        标签
+            category    分类
+            is_draft    是否为草稿
         """
         username = request.session.get('username')
 
