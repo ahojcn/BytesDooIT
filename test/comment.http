@@ -1,0 +1,18 @@
+# For a quick start check out our HTTP Requests collection (Tools|HTTP Client|Open HTTP Requests Collection).
+#
+# Following HTTP Request Live Templates are available:
+# * 'gtrp' and 'gtr' create a GET request with or without query parameters;
+# * 'ptr' and 'ptrp' create a POST request with a simple or parameter-like body;
+# * 'mptr' and 'fptr' create a POST request to submit a form with a text or file field (multipart/form-data);
+
+### 新增评论
+
+POST http://127.0.0.1:7788/api/comment/
+Content-Type: application/json
+
+{
+  "post_id": 73,
+  "content": "73 - comment - 1"
+}
+
+###
