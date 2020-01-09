@@ -160,7 +160,20 @@
 4. 响应
 
     ```json
-    {}
+    {
+      "status_code": -1,
+      "msg": "未登录",
+      "data": {
+        "is_login": false
+      }
+    }
+    ```
+    ```json
+    {
+      "status_code": 0,
+      "msg": "成功",
+      "data": {}
+    }
     ```
 
 5. 说明

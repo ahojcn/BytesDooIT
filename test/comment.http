@@ -17,7 +17,32 @@ Content-Type: application/json
 
 ### 获取评论
 
-GET http://127.0.0.1:7788/api/comment?post_id=73
+GET http://127.0.0.1:7788/api/comment/?post_id=73
 Accept: application/json
+
+### 删除评论
+
+DELETE http://127.0.0.1:7788/api/comment/?post_id=73
+Accept: application/json
+
+### 喜欢评论
+
+POST http://127.0.0.1:7788/api/comment/like/
+Content-Type: application/json
+
+{
+  "id": 1,
+  "like": true
+}
+
+### 不喜欢评论
+
+POST http://127.0.0.1:7788/api/comment/like/
+Content-Type: application/json
+
+{
+  "id": 1,
+  "like": false
+}
 
 ###

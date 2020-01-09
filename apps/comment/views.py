@@ -39,9 +39,11 @@ class CommentView(APIView):
             except ObjectDoesNotExist:
                 resp_data['status_code'] = -1
                 resp_data['msg'] = '无相关文章'
+                return Response(resp_data)
             except Exception as e:
                 resp_data['status_code'] = -1
                 resp_data['msg'] = '未知错误' + str(e)
+                return Response(resp_data)
         video = None
         if video_id:
             try:
@@ -52,7 +54,6 @@ class CommentView(APIView):
             except Exception as e:
                 resp_data['status_code'] = -2
                 resp_data['msg'] = '未知错误' + str(e)
-            finally:
                 return Response(resp_data)
         ref = None
         try:
@@ -122,5 +123,79 @@ class CommentView(APIView):
                 'create_datetime': c.create_datetime,
                 'extra_data': c.extra_data,
             })
+
+        return Response(resp_data)
+
+    @need_login
+    def delete(self, request):
+        """
+        删除评论
+        """
+        resp_data = {'status_code': 0, 'msg': '成功', 'data': {}}
+
+        username = request.session.get('username')
+        user = User.objects.get(username=username)
+
+        comment_id = request.query_params.get('id')
+
+        if not comment_id:
+            resp_data['status_code'] = -1
+            resp_data['msg'] = '参数不足'
+            return Response(resp_data)
+
+        comment = None
+        try:
+            comment = Comment.objects.get(id=comment_id, user=user)
+        except ObjectDoesNotExist:
+            resp_data['status_code'] = -1
+            resp_data['msg'] = '无相关评论'
+            return Response(resp_data)
+        except Exception as e:
+            resp_data['status_code'] = -2
+            resp_data['msg'] = '未知错误' + str(e)
+            return Response(resp_data)
+
+        comment.is_delete = True
+        comment.save()
+
+        return Response(resp_data)
+
+
+class CommentLike(APIView):
+
+    @need_login
+    def post(self, request):
+        """
+        喜欢 / 不喜欢某个评论
+        """
+        resp_data = {'status_code': 0, 'msg': '成功', 'data': {}}
+
+        comment_id = request.data.get('id')
+        like = request.data.get('like')
+
+        if not all([comment_id]) and like is None:
+            resp_data['status_code'] = -1
+            resp_data['msg'] = '参数不足'
+            return Response(resp_data)
+
+        like = bool(like)
+
+        try:
+            comment = Comment.objects.get(id=comment_id)
+        except ObjectDoesNotExist:
+            resp_data['status_code'] = -1
+            resp_data['msg'] = '评论不存在'
+            return Response(resp_data)
+        except Exception as e:
+            resp_data['status_code'] = -2
+            resp_data['msg'] = '未知错误' + str(e)
+            return Response(resp_data)
+
+        if like:
+            comment.like_count += 1
+            comment.save()
+        else:
+            comment.unlike_count += 1
+            comment.save()
 
         return Response(resp_data)
