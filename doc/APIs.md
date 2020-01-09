@@ -25,9 +25,22 @@
     | content | string | 是 | 评论内容 |
  
 4. 响应
-
+    
     ```json
-    {}
+    {
+      "status_code": -1,
+      "msg": "未登录",
+      "data": {
+        "is_login": false
+      }
+    }
+    ```
+    ```json
+    {
+      "status_code": 0,
+      "msg": "成功",
+      "data": {}
+    }
     ```
 
 5. 说明
@@ -53,16 +66,38 @@
 
     | 参数名 | 类型 | 必须 | 描述 |
     |---|---|---|---|
-    | to | string | 是 | VIDEO/POST |
     | post_id | int | 否 | 文章id |
     | video_id | int | 否 | 视频id |
-    | page_index | int | 是 | 分页参数，当前第几页 |
-    | page_size | int | 是 | 分页参数，每页多少条 | 
+    | page_index | int | 否 | 分页参数，当前第几页，默认 1 |
+    | page_size | int | 否 | 分页参数，每页多少条，默认 5 | 
 
 4. 响应
 
     ```json
-    {}
+    {
+      "status_code": 0,
+      "msg": "添加成功",
+      "data": {
+        "page_index": 1,
+        "page_size": 5,
+        "total_page": 1,
+        "total_post": 1,
+        "comments": [
+          {
+            "username": "ahojcn0",
+            "avatar": "media/img/default_avatar.png",
+            "level": 1,
+            "post_id": 73,
+            "content": "73 - comment - 1",
+            "ref_content": null,
+            "like_count": 0,
+            "unlike_count": 0,
+            "create_datetime": "2020-01-09T12:03:49.626502Z",
+            "extra_data": ""
+          }
+        ]
+      }
+    }
     ```
 
 5. 说明

@@ -15,4 +15,9 @@ Content-Type: application/json
   "content": "73 - comment - 1"
 }
 
+### 获取评论
+
+GET http://127.0.0.1:7788/api/comment?post_id=73
+Accept: application/json
+
 ###
