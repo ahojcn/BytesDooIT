@@ -13,13 +13,13 @@ from mauth.glob import need_verify_code, need_login
 from util.celery_tasks import tasks
 
 
-# class TestView(APIView):
-#
-#     def get(self, request):
-#         from user.serializers import UserSerializer
-#         users = User.objects.all()
-#         serializer = UserSerializer(users, many=True)
-#         return Response(serializer.data)
+class TestView(APIView):
+
+    def get(self, request):
+        from user.serializers import UserSerializer
+        users = User.objects.all()
+        serializer = UserSerializer(users, many=True)
+        return Response(serializer.data)
 
 
 class UserView(APIView):
