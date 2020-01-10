@@ -34,7 +34,7 @@ class UserAuthority(models.Model):
     """
     用户权限表
     """
-    user_id = models.ForeignKey(to=User, on_delete=models.DO_NOTHING, null=False, blank=False, verbose_name='用户id')
+    user = models.ForeignKey(to=User, on_delete=models.DO_NOTHING, null=False, blank=False, verbose_name='用户id')
     video = models.BooleanField(default=False, verbose_name='上传视频权限')
     post = models.BooleanField(default=False, verbose_name='新增文章权限')
     resume = models.BooleanField(default=False, verbose_name='新增简历权限')
@@ -55,7 +55,7 @@ class UserResume(models.Model):
     """
     用户简历表
     """
-    user_id = models.ForeignKey(to=User, on_delete=models.DO_NOTHING, null=False, blank=False, verbose_name='用户id')
+    user = models.ForeignKey(to=User, on_delete=models.DO_NOTHING, null=False, blank=False, verbose_name='用户id')
     outline = models.TextField(default='', verbose_name='简介')
     educational = models.TextField(default='', verbose_name='教育经历')
     job_exp = models.TextField(default='', verbose_name='工作经历')
@@ -77,7 +77,7 @@ class UserAuthenticationInfo(models.Model):
     """
     用户认证信息表
     """
-    user_id = models.ForeignKey(to=User, on_delete=models.DO_NOTHING, null=False, blank=False, verbose_name='用户id')
+    user = models.ForeignKey(to=User, on_delete=models.DO_NOTHING, null=False, blank=False, verbose_name='用户id')
     AUTH_TO_CHOICES = ((0, '直播'), (1, '招聘'))
     auth_to = models.SmallIntegerField(choices=AUTH_TO_CHOICES, verbose_name='认证干什么')
     id_card_photo_path = models.CharField(null=False, blank=False, max_length=1024, verbose_name='身份证照片')

@@ -13,9 +13,16 @@ from mauth.glob import need_verify_code, need_login
 from util.celery_tasks import tasks
 
 
-class UserView(APIView):
+# class TestView(APIView):
+#
+#     def get(self, request):
+#         from user.serializers import UserSerializer
+#         users = User.objects.all()
+#         serializer = UserSerializer(users, many=True)
+#         return Response(serializer.data)
 
-    # todo get 获取单个用户信息
+
+class UserView(APIView):
 
     @need_verify_code
     def post(self, request):
@@ -116,7 +123,7 @@ class UserView(APIView):
         return Response(resp_data)
 
 
-class UserActive(APIView):
+class UserActiveView(APIView):
 
     @need_login
     def post(self, request):
@@ -195,7 +202,7 @@ class UserActive(APIView):
             return render(request, 'user_active.html', resp_data)
 
 
-class UserSession(APIView):
+class UserSessionView(APIView):
 
     @need_verify_code
     def post(self, request):
