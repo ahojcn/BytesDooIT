@@ -28,7 +28,7 @@ SECRET_KEY = private.SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-BASE_WEB_URL = 'http://127.0.0.1:8000/'
+BASE_WEB_URL = 'http://127.0.0.1:7788/'
 
 ALLOWED_HOSTS = ['*']
 
@@ -86,7 +86,7 @@ MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',  # cors headers
     'django.middleware.common.CommonMiddleware',
-    # 'django.middleware.csrf.CsrfViewMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',

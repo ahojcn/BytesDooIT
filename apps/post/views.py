@@ -1,5 +1,3 @@
-import datetime
-
 from django.conf import settings
 from django.core.paginator import Paginator
 from rest_framework.views import APIView
@@ -324,7 +322,7 @@ class PostView(APIView):
                     'email': p.user.email,
                     'desc': p.user.description,
                     'reg_time': p.user.reg_datetime,
-                    'avatar': p.user.avatar_path,
+                    'avatar': settings.BASE_WEB_URL + p.user.avatar_path,
                     'level': p.user.level,
                     'exp_val': p.user.exp_val,
                     'food_num': p.user.food_num,

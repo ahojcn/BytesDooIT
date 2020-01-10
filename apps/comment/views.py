@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.core.paginator import Paginator
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.views import APIView
@@ -78,14 +79,13 @@ class CommentView(APIView):
         """
         获取评论
         """
-        resp_data = {'status_code': 0, 'msg': '添加成功', 'data': {}}
+        resp_data = {'status_code': 0, 'msg': '成功', 'data': {}}
 
         post_id = request.query_params.get('post_id')
         video_id = request.query_params.get('video_id')
         page_index = int(request.query_params.get('page_index', 1))
         page_size = int(request.query_params.get('page_size', 5))
 
-        print(not post_id and not video_id)
         if not post_id and not video_id:
             resp_data['status_code'] = -1
             resp_data['msg'] = '参数不足'
@@ -93,12 +93,13 @@ class CommentView(APIView):
 
         comments = []
         if post_id:
-            comments = Comment.objects.filter(post_id=post_id)
+            comments = Comment.objects.filter(post_id=post_id).order_by('-create_datetime').values()
         if video_id:
-            comments = Comment.objects.filter(video_id=video_id)
+            comments = Comment.objects.filter(video_id=video_id).order_by('-create_datetime').values()
 
         total_comments = len(comments)
         paged_comments = Paginator(comments, page_size)
+
         comments = paged_comments.get_page(page_index)
         total_page = paged_comments.num_pages
 
@@ -111,17 +112,17 @@ class CommentView(APIView):
         }
 
         for c in comments:
+            user = User.objects.get(id=c['user_id'])
             resp_data['data']['comments'].append({
-                'username': c.user.username,
-                'avatar': c.user.avatar_path,
-                'level': c.user.level,
-                'post_id': c.post.id,
-                'content': c.content,
-                'ref_content': c.ref,
-                'like_count': c.like_count,
-                'unlike_count': c.unlike_count,
-                'create_datetime': c.create_datetime,
-                'extra_data': c.extra_data,
+                'id': c['id'],
+                'content': c['content'],
+                'ref_content': c['ref_id'],
+                'like_count': c['like_count'],
+                'unlike_count': c['unlike_count'],
+                'create_datetime': c['create_datetime'],
+                'extra_data': c['extra_data'],
+                'username': user.username,
+                'avatar': settings.BASE_WEB_URL + user.avatar_path,
             })
 
         return Response(resp_data)
