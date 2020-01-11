@@ -9,6 +9,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from user.models import User
+from user.serializers import UserSerializer
 from mauth.glob import need_verify_code, need_login
 from util.celery_tasks import tasks
 
@@ -19,6 +20,7 @@ class TestView(APIView):
         from user.serializers import UserSerializer
         users = User.objects.all()
         serializer = UserSerializer(users, many=True)
+        print(serializer)
         return Response(serializer.data)
 
 
@@ -30,10 +32,6 @@ class UserView(APIView):
         用户注册
         """
         resp_data = {'data': {}, 'status_code': 0, 'msg': '成功'}
-        # print(request.META.get('REMOTE_ADDR'))
-
-        # request.META.get('HTTP_X_FORWARDED_FOR') if request.META.get('HTTP_X_FORWARDED_FOR') else request.META.get(
-        # 'REMOTE_ADDR')
 
         username = request.data.get('username')
         email = request.data.get('email')
@@ -82,9 +80,8 @@ class UserView(APIView):
         try:
             user_obj = User.objects.create(username=username, password=pwd_md5, email=email, is_active=False)
         except Exception as e:
-            print(e)
             resp_data['status_code'] = -2
-            resp_data['msg'] = '未知错误'
+            resp_data['msg'] = '未知错误' + str(e)
             return Response(resp_data)
 
         # 生成激活链接
@@ -98,24 +95,10 @@ class UserView(APIView):
                                {'username': username, 'email': email, 'active_url': active_url})
 
         # 返回用户信息
+        us = UserSerializer(user_obj, many=True)
         resp_data['status_code'] = 0
         resp_data['msg'] = '成功，已发送激活邮件'
-        resp_data['data'] = {
-            'user_id': user_obj.id,
-            'username': user_obj.username,
-            'email': user_obj.email,
-            'gender': user_obj.gender,
-            'description': user_obj.description,
-            'reg_datetime': user_obj.reg_datetime,
-            'avatar_path': user_obj.avatar_path,
-            'last_login_datetime': user_obj.last_login_datetime,
-            'level': user_obj.level,
-            'exp_val': user_obj.exp_val,
-            'food_num': user_obj.food_num,
-            'is_mute': user_obj.is_mute,
-            'is_active': user_obj.is_active,
-            'extra_data': user_obj.extra_data
-        }
+        resp_data['data'] = us.data
 
         # 设置 session 记住登录
         request.session['username'] = user_obj.username
@@ -172,24 +155,11 @@ class UserActiveView(APIView):
             user_obj.is_active = True
             user_obj.save()
 
+            us = UserSerializer(user_obj, many=True)
+
             resp_data['status_code'] = 0
             resp_data['msg'] = '成功'
-            resp_data['data'] = {
-                'user_id': user_obj.id,
-                'username': user_obj.username,
-                'email': user_obj.email,
-                'gender': user_obj.gender,
-                'description': user_obj.description,
-                'reg_datetime': user_obj.reg_datetime,
-                'avatar_path': user_obj.avatar_path,
-                'last_login_datetime': user_obj.last_login_datetime,
-                'level': user_obj.level,
-                'exp_val': user_obj.exp_val,
-                'food_num': user_obj.food_num,
-                'is_mute': user_obj.is_mute,
-                'is_active': user_obj.is_active,
-                'extra_data': user_obj.extra_data
-            }
+            resp_data['data'] = us.data
         except SignatureExpired:
             # 激活用的 token 过期
             resp_data['status_code'] = -1
@@ -250,24 +220,10 @@ class UserSessionView(APIView):
         # 记住登录状态
         request.session['username'] = user_obj.username
 
+        us = UserSerializer(user_obj, many=True)
         resp_data['status_code'] = 0
         resp_data['msg'] = '成功'
-        resp_data['data'] = {
-            'user_id': user_obj.id,
-            'username': user_obj.username,
-            'email': user_obj.email,
-            'gender': user_obj.gender,
-            'description': user_obj.description,
-            'reg_datetime': user_obj.reg_datetime,
-            'avatar_path': user_obj.avatar_path,
-            'last_login_datetime': user_obj.last_login_datetime,
-            'level': user_obj.level,
-            'exp_val': user_obj.exp_val,
-            'food_num': user_obj.food_num,
-            'is_mute': user_obj.is_mute,
-            'is_active': user_obj.is_active,
-            'extra_data': user_obj.extra_data
-        }
+        resp_data['data'] = us.data
 
         return Response(resp_data, status=200)
 
@@ -296,25 +252,11 @@ class UserSessionView(APIView):
                 return Response(resp_data)
 
             user_obj = user_obj_set.get(username=username)
+            us = UserSerializer(user_obj, many=False)
             resp_data['status_code'] = 0
             resp_data['msg'] = '已登录'
-            resp_data['data'] = {
-                'is_login': True,
-                'user_id': user_obj.id,
-                'username': user_obj.username,
-                'email': user_obj.email,
-                'gender': user_obj.gender,
-                'description': user_obj.description,
-                'reg_datetime': user_obj.reg_datetime,
-                'avatar_path': user_obj.avatar_path,
-                'last_login_datetime': user_obj.last_login_datetime,
-                'level': user_obj.level,
-                'exp_val': user_obj.exp_val,
-                'food_num': user_obj.food_num,
-                'is_mute': user_obj.is_mute,
-                'is_active': user_obj.is_active,
-                'extra_data': user_obj.extra_data
-            }
+            resp_data['data'] = us.data
+            resp_data['data'].update({'is_login': True})
 
         return Response(resp_data)
 
